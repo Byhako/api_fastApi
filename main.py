@@ -63,3 +63,41 @@ def create_movie(
         'category': category,
     })
     return movies
+
+
+@app.put('/movie/{id}', tags=['Movie'])
+def update_movie(
+    id: int,
+    title: str=Body(),
+    overview: str=Body(),
+    year: int=Body(),
+    rating: float=Body(),
+    category: str=Body()
+    ):
+    movie_list = list(filter(lambda x: x['id'] == id, movies))
+    if (len(movie_list)):
+        movie = movie_list[0]
+        index = movies.index(movie)
+        movie['title'] = title
+        movie['overview'] = overview
+        movie['rating'] = rating
+        movie['year'] = year
+        movie['category'] = category
+
+        movies[index] = movie
+
+        return movie
+    else:
+        return 'Movie not found'
+
+
+@app.delete('/movie/{id}', tags=['Movie'])
+def delete_movie(id: int):
+    movie_list = list(filter(lambda x: x['id'] == id, movies))
+    if (len(movie_list)):
+        movie = movie_list[0]
+        movies.remove(movie)
+
+        return 'Movie deleted'
+    else:
+        return 'Movie not found'
