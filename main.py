@@ -1,28 +1,11 @@
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
+from model import Movie
+from data import movies
 
 app = FastAPI()
 app.title = 'Byhako App'
 app.version = '0.1.0'
-
-movies = [
-    {
-        "id": 1,
-        "title": "Avatar",
-        "overview": "En un exuberante planeta llamado Pandora viven los Na'vi, seres que...",
-        "year": "2009",
-        "rating": 7.8,
-        "category": "Accion"
-    },
-    {
-        "id": 2,
-        "title": "Potter",
-        "overview": "Un mago poderoso pero chillon",
-        "year": "2009",
-        "rating": 7.8,
-        "category": "Aventura"
-    }
-]
 
 
 @app.get('/', tags=['Home'])
@@ -46,43 +29,22 @@ def get_movies_by_category(category: str):
 
 
 @app.post('/movie', tags=['Movie'])
-def create_movie(
-    id: int=Body(),
-    title: str=Body(),
-    overview: str=Body(),
-    year: int=Body(),
-    rating: float=Body(),
-    category: str=Body()
-    ):
-    movies.append({
-        'id': id,
-        'title': title,
-        'overview': overview,
-        'year': year,
-        'rating': rating,
-        'category': category,
-    })
+def create_movie(movie: Movie):
+    movies.append(movie)
     return movies
 
 
 @app.put('/movie/{id}', tags=['Movie'])
-def update_movie(
-    id: int,
-    title: str=Body(),
-    overview: str=Body(),
-    year: int=Body(),
-    rating: float=Body(),
-    category: str=Body()
-    ):
+def update_movie(id: int, movie: Movie):
     movie_list = list(filter(lambda x: x['id'] == id, movies))
     if (len(movie_list)):
         movie = movie_list[0]
         index = movies.index(movie)
-        movie['title'] = title
-        movie['overview'] = overview
-        movie['rating'] = rating
-        movie['year'] = year
-        movie['category'] = category
+        movie['title'] = movie.title
+        movie['overview'] = movie.overview
+        movie['rating'] = movie.rating
+        movie['year'] = movie.year
+        movie['category'] = movie.category
 
         movies[index] = movie
 
