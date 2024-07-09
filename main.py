@@ -35,20 +35,14 @@ def create_movie(movie: Movie):
 
 
 @app.put('/movie/{id}', tags=['Movie'])
-def update_movie(id: int, movie: Movie):
+def update_movie(id: int, new_movie: Movie):
     movie_list = list(filter(lambda x: x['id'] == id, movies))
     if (len(movie_list)):
         movie = movie_list[0]
         index = movies.index(movie)
-        movie['title'] = movie.title
-        movie['overview'] = movie.overview
-        movie['rating'] = movie.rating
-        movie['year'] = movie.year
-        movie['category'] = movie.category
+        movies[index] = new_movie
 
-        movies[index] = movie
-
-        return movie
+        return new_movie
     else:
         return 'Movie not found'
 
