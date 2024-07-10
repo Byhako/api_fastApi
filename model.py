@@ -1,10 +1,22 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class Movie(BaseModel):
     id: Optional[int] = None
-    title: str
-    overview: str
-    year: int
-    rating: float
-    category: str
+    title: str=Field(min_length=5,max_length=15)
+    overview: str=Field(min_length=15,max_length=50)
+    year: int=Field(le=2022)
+    rating: float=Field(le=10, ge=1)
+    category: str=Field(min_length=5,max_length=15)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 3,
+                "title": "Movie name",
+                "overview": "Movie description",
+                "year": 2022,
+                "rating": 3.4,
+                "category": "Drama"
+            }
+        }
