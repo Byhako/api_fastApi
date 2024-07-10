@@ -1,21 +1,46 @@
-from fastapi import FastAPI, Path, Query, status
+from fastapi import Depends, FastAPI, Path, Query, status
 from fastapi.responses import HTMLResponse, JSONResponse
-from model import Movie
+from model import JWTBearer, Movie, User
 from typing import List
 from data import movies
+from jwt_manager import create_token
 
 app = FastAPI()
 app.title = 'Byhako App'
 app.version = '0.1.0'
 
 
+# LOGIN
+@app.post('/login', tags=['Auth'])
+def login(user: User):
+    if user.email == 'toto@mail.com' and user.password == 'toto':
+        token: str = create_token(user.model_dump())
+        return JSONResponse(
+            content={ 'token': token },
+            status_code=status.HTTP_202_ACCEPTED
+            )
+    else:
+        return JSONResponse(
+            content={ 'token': None },
+            status_code=status.HTTP_401_UNAUTHORIZED
+            )
+
+@app.get('/logout', tags=['Auth'])
+def logout():
+    return 'OK'
+
 @app.get('/', tags=['Home'])
 def message():
     return HTMLResponse('<h1>Hola Ruben jajaj</h1>')
 
 
-@app.get('/movies', tags=['Movie'], response_model=List[Movie])
-def get_movie():
+@app.get(
+    '/movies',
+    tags=['Movie'],
+    response_model=List[Movie],
+    dependencies=[Depends(JWTBearer())]
+)
+def get_movie() -> List[Movie]:
     return JSONResponse(
         content=movies,
         status_code=status.HTTP_200_OK

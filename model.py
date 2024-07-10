@@ -1,5 +1,10 @@
+from fastapi import HTTPException, Request
+from fastapi.security.http import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
-from typing import Optional
+from fastapi.security import HTTPBearer
+from typing import Coroutine, Optional
+
+from jwt_manager import validate_token
 
 class Movie(BaseModel):
     id: Optional[int] = None
@@ -20,3 +25,15 @@ class Movie(BaseModel):
                 "category": "Drama"
             }
         }
+
+
+class User(BaseModel):
+    email: str
+    password: str
+
+class JWTBearer(HTTPBearer):
+    async def __call__(self, request: Request):
+        auth = await super().__call__(request)
+        data = validate_token(auth.credentials)
+        if data['email'] != 'toto@mail.com':
+            raise HTTPException(status_code=403, detail='Invalid credentials')
